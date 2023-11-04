@@ -41,13 +41,15 @@ class Health(models.Model):
     name = models.CharField(max_length=200, default='')
     description = models.TextField()
     animal = models.ForeignKey('Animal', on_delete=models.CASCADE, default=None)
+    created_at = models.DateTimeField(auto_now_add=True)
 
 class Vaccination(models.Model):
     name = models.CharField(max_length=200)
     animal = models.ForeignKey('Animal', on_delete=models.CASCADE)
     date = models.DateTimeField()
     expiration_date = models.DateTimeField()
-
+    created_at = models.DateTimeField(auto_now_add=True)
+    
 class CostsCategory(models.Model):
     name = models.CharField(max_length=50)
 
