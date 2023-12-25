@@ -247,13 +247,8 @@ class DeleteWorkerAPIView(APIView):
 
 class ContactSupportAPIView(APIView):
      def post(self, request):
-        print(request.data)
         email = request.data.get('email')
         content = request.data.get('content')
-
-        print(email)
-        print(content)
-        
 
         farmer = Farmer.objects.filter(email=email)
         if not farmer:

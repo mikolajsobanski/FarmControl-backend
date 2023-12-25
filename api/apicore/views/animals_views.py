@@ -5,6 +5,10 @@ from ..serializers import SpeciesSerializer, AnimalSerializer, CostsCategorySeri
 from ..models import Species, Animal, CostsCategory, Vaccination, Health, Costs
 from apiauth.models import Farmer
 from operator import itemgetter
+from apianalysis.tasks import check_vaccine_expiry, test
+from django.core.mail import send_mail
+from datetime import timedelta
+from django.utils import timezone
 
 class SpeciesAPIView(APIView):
     def post(self, request):
@@ -30,8 +34,9 @@ class SpeciesAPIView(APIView):
     def get(self, request):
         species = Species.objects.filter()
         serializer = SpeciesSerializer(species, many=True)
+        #check_vaccine_expiry.delay()
         return Response(serializer.data)
-    
+   
 class SpeciesSearchAPIView(APIView):
     def get(self, request):
         query = request.query_params.get('query')
@@ -243,4 +248,26 @@ class LatestCostsAPIView(APIView):
         costs = sorted(costs, key=itemgetter('created_at'), reverse=True)
         return Response(costs)
             
-        
+class FarmerAnimalSpeciesFilterAPIView(APIView):
+    def get(self, request):
+        pk = request.query_params.get('pk')
+        ownerAnimals = Animal.objects.filter(owner=pk)
+        serializer = AnimalSerializer(ownerAnimals, many=True)
+        animal_ids = [animal['species'] for animal in serializer.data]
+        unique_values = set()
+        distinct_species = [unique_values.add(item) or item for item in animal_ids if item not in unique_values]
+        species = []
+        if not len(animal_ids) == 0:
+            for id in distinct_species:
+                queryset = Species.objects.filter(id=int(id))
+                serializer = SpeciesSerializer(queryset, many=True)
+                species.extend(serializer.data)
+        return Response(species)
+    
+class FarmerAnimalSpeciesResultAPIView(APIView):
+    def get(self, request):
+        pk = request.query_params.get('pk')
+        species = request.query_params.get('species')
+        ownerAnimals = Animal.objects.filter(owner=pk, species=species)
+        serializer = AnimalSerializer(ownerAnimals, many=True)
+        return Response(serializer.data)

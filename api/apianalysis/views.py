@@ -74,6 +74,7 @@ class AnimalCostByCategoryAPIView(APIView):
         pk = request.query_params.get('pk')
         animal = Animal.objects.filter(id=pk).first()
         animal_costs_by_category = animal.animal_costs.values('category__name').annotate(value=Sum('amount'))
+        
         return Response(animal_costs_by_category)
 
 class CategoryCostAPIView(APIView):
