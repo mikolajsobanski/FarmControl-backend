@@ -42,6 +42,9 @@ INSTALLED_APPS = [
     'corsheaders',
     'apiauth.apps.ApiauthConfig',
     'apicore.apps.ApicoreConfig',
+    'apianalysis.apps.ApianalysisConfig',
+    'django_celery_beat',
+    'django_celery_results',
 ]
 
 MIDDLEWARE = [
@@ -161,3 +164,18 @@ EMAIL_USE_SSL = False
 #Media (images) configuration
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+#RabbitMq
+#CELERY_BROKER_URL = 'pyamqp://guest@172.18.0.3:5672//'
+CELERY_RESULT_BACKEND = 'db+postgresql://postgres:postgres@localhost:5432/farmControl'
+CELERY_BROKER_URL = 'pyamqp://guest@localhost//'
+#redis
+#CELERY_BROKER_URL = 'redis://172.18.0.2:6379'
+#CELERY_RESULT_BACKEND = 'redis://172.18.0.3:6379/0'
+#CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_WORKER_CANCEL_LONG_RUNNING_TASKS_ON_CONNECTION_LOSS = True
+CELERY_APP = 'api'
+CELERY_TASK_DEFAULT_QUEUE = 'default'
